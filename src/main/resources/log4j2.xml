@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN"  shutdownHook="disable">
+    <Properties>
+        <Property name="BASE">${ctx:BASE_VOL}logs</Property>
+        <Property name="LAYOUT">%d{ISO8601}{GMT} %p %m [%c{1} %t]%n</Property>
+        <Property name="RO">${ctx:ROUTINGKEY}</Property>
+        <Property name="PORT">${ctx:SYSLOG_PORT}</Property>
+        <Property name="HOST">${ctx:SYSLOG_HOST}</Property>
+    </Properties>
+
+    <Appenders>
+        <Routing name="ServerAppender">
+            <Routes pattern="$${RO}">
+                <Route key="CONTAINER_SYS">
+                    <Syslog name="Server" format="RFC5424" host="${HOST}" port="${PORT}"
+                            protocol="TCP" appName="MTO"  mdcId="mdc" includeMDC="true"
+                            facility="LOCAL0" enterpriseNumber="18060" newLine="true"
+                            messageId="Server" id="App"/>
+                </Route>
+                <Route>
+                    <RollingRandomAccessFile name="Server" fileName="${BASE}/server.log"
+                                             filePattern="${BASE}/server-%d{yyyy-MM-dd}-%i.log.gz">
+                        <PatternLayout pattern="${LAYOUT}"/>
+                        <Policies>
+                            <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                            <SizeBasedTriggeringPolicy size="1024 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="30" min="1" fileIndex="1"/>
+                    </RollingRandomAccessFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="JettyAppender">
+            <Routes pattern="$${RO}">
+                <Route key="CONTAINER_SYS">
+                    <Syslog name="Jetty" format="RFC5424" host="${HOST}" port="${PORT}"
+                            protocol="TCP" appName="MTO"  mdcId="mdc" includeMDC="true"
+                            facility="LOCAL0" enterpriseNumber="18060" newLine="true"
+                            messageId="Jetty-request" id="App"/>
+                </Route>
+                <Route>
+                    <RollingRandomAccessFile name="JettyAppender" fileName="${BASE}/jetty-request.log"
+                                             filePattern="${BASE}/jetty-request-%d{yyyy-MM-dd}-%i.log.gz">
+                        <PatternLayout pattern="%p %m [%c{1} %t]%n" />
+                        <Policies>
+                            <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                            <SizeBasedTriggeringPolicy size="1024 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="30" min="1" fileIndex="1"/>
+                    </RollingRandomAccessFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Routing name="MetricsAppender">
+            <Routes pattern="$${RO}">
+                <Route key="CONTAINER_SYS">
+                    <Syslog name="Metrics" format="RFC5424" host="${HOST}" port="${PORT}"
+                            protocol="TCP" appName="MTO"  mdcId="mdc" includeMDC="true"
+                            facility="LOCAL0" enterpriseNumber="18060" newLine="true"
+                            messageId="Metrics" id="App"/>
+                </Route>
+                <Route>
+                    <RollingRandomAccessFile name="MetricsAppender" fileName="${BASE}/metrics.log"
+                                             filePattern="${BASE}/metrics-%i.log">
+                        <PatternLayout pattern="${LAYOUT}" />
+                        <Policies>
+                            <SizeBasedTriggeringPolicy size="10 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="15" min="1" fileIndex="1"/>
+                    </RollingRandomAccessFile>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d %p %m [%c{1} %t]%n" />
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="metrics" level="info" additivity="false">
+            <AppenderRef ref="MetricsAppender"/>
+        </Logger>
+
+        <Logger name="org.eclipse.jetty.server.RequestLog" level="info" additivity="false">
+            <AppenderRef ref="JettyAppender"/>
+        </Logger>
+
+        <Root level="info">
+            <AppenderRef ref="ServerAppender"/>
+            <AppenderRef ref="Console" level="${ctx:STD_OUT_LOG_LEVEL}"/>
+        </Root>
+    </Loggers>
+</Configuration>
