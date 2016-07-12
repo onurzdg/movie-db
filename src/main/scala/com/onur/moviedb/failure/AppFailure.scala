@@ -14,5 +14,3 @@ trait FailureMsg {
 
 trait OperationFailure extends FailureMsg with Product with Serializable
 trait ValidationFailure extends FailureMsg with Product with Serializable
-
-

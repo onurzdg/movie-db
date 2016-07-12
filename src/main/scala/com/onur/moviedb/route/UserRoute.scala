@@ -34,5 +34,3 @@ private class UserRoute private(userService: UserService) extends RhoService wit
     }
   }
 }
-
-

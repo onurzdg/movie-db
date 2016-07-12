@@ -24,5 +24,3 @@ object Login {
   private def validate(l: Login[UnValidated]): LoginValidation =
     (l.email.validationNel |@| l.pass.validationNel)(Login[Validated])
 }
-
-

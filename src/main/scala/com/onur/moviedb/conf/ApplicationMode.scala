@@ -54,4 +54,3 @@ object ApplicationMode {
 final case class InvalidApplicationMode(m: String) extends ValidationFailure {
   def failMsg = s"Invalid application mode $m"
 }
-

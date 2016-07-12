@@ -71,5 +71,4 @@ object JettyLauncher {
         e.printStackTrace()
     }
   }
-
 }

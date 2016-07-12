@@ -37,4 +37,3 @@ object UserCreation {
       (a,b,c,d) => UserCreation[Validated](a,b,c,d.title)
     )
 }
-

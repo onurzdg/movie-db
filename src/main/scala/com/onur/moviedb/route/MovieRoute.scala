@@ -25,4 +25,3 @@ private class MovieRoute(movieService: MovieService) extends RhoService with Arg
   GET |>> movieService.getMovies.map(_.asJson)
 
 }
-

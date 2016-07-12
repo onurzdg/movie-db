@@ -64,5 +64,3 @@ object AuthenticationRoute {
     }
   }
 }
-
-
